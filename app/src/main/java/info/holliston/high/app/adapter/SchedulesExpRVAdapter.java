@@ -1,9 +1,9 @@
 package info.holliston.high.app.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +67,14 @@ public class SchedulesExpRVAdapter extends ExpandableRVAdapter {
                 vha.icon.setImageResource(R.drawable.star_sm);
                 break;
         }
+
+        String headerString = headers.get(position);
+        if (headerString != null) {
+            vha.headerTextview.setText(headerString);
+            vha.headerFrame.setVisibility(View.VISIBLE);
+        } else {
+            vha.headerFrame.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -74,14 +82,13 @@ public class SchedulesExpRVAdapter extends ExpandableRVAdapter {
      * data will be grouped by week of the year (this week, next week, etc)
      *
      * @param list    the data to be sorted, in List form
-     * @return        a list of headers and data rows
      */
     @Override
-    protected List<Object> sortIntoGroups(List<Article> list) {
+    protected void createHeaders(List<Article> list) {
 
         // track the current group
         int currentWeek = -1;
-        List<Object> tempList = new ArrayList<>();
+        headers.clear();
 
         // if trimmable and it's after 2pm and the data is today's data, skip the first row
         if (isTrimmable && needsTrimming(list)) {
@@ -102,24 +109,21 @@ public class SchedulesExpRVAdapter extends ExpandableRVAdapter {
                 Calendar todaycal = Calendar.getInstance();
                 todaycal.setTime(new Date());
                 int thisWeek = todaycal.get(Calendar.WEEK_OF_YEAR);
-                String headerString;
 
                 if (schedWeek == thisWeek) {
-                    headerString = getContext().getString(R.string.this_week);
-                    tempList.add(headerString);
+                    headers.add(getContext().getString(R.string.this_week));
                 } else if (schedWeek == thisWeek+1) {
-                    headerString = getContext().getString(R.string.next_week);
-                    tempList.add(headerString);
-                }
-                else if (schedWeek == thisWeek+2) {
-                    headerString = getContext().getString(R.string.farther);
-                    tempList.add(headerString);
+                    headers.add(getContext().getString(R.string.next_week));
+                } else if (schedWeek == thisWeek+2) {
+                    headers.add(getContext().getString(R.string.farther));
+                } else {
+                    headers.add("");
                 }
                 currentWeek = schedWeek;
+            } else {
+                headers.add(null);
             }
-            tempList.add(article);
         }
-        return tempList;
     }
 }
 

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,7 +31,9 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     // The organized data. Data can be sorted into groups, and the group header (for example,
     // "Today's Events") can be inserted as its own separate row in the list.
-    private List<Object> groupedArticleList = new ArrayList<>();
+    private List<Article> mArticleList = new ArrayList<>();
+
+    List<String> headers = new ArrayList<>();
 
     // Whether or not the data can be trimmed based on time of day. For example, Schedules data
     // is usually marked isTrimmable = true so that, after 2pm, today's schedule is ignored
@@ -52,13 +55,8 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * @param articleList  List of articles to display
      */
     public void setData(List<Article> articleList) {
-        groupedArticleList.clear();
-
-        if ((articleList !=null) && (articleList.size() >0)) {
-            groupedArticleList.addAll(sortIntoGroups(articleList));
-        } else {
-            groupedArticleList.add(0);
-        }
+        mArticleList = articleList;
+        createHeaders(articleList);
     }
 
     /**
@@ -75,14 +73,8 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * etc.
      *
      * @param articleList    the data to be sorted, in List form
-     * @return List<Object>  the list of rows, with Strings for headers and Articles for data rows.
-     *                       If the data set is empty, a single row with value int 0 should be returned.
      */
-    protected List<Object> sortIntoGroups(List<Article> articleList) {
-        List<Object> returnList = new ArrayList<>();
-        returnList.addAll(articleList);
-
-        return returnList;
+    protected void createHeaders(List<Article> articleList) {
     }
 
     /**
@@ -106,7 +98,7 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
 
     /**
-     * Gets the type of data for a given row. Row types are determined by the groupedArticleList's
+     * Gets the type of data for a given row. Row types are determined by the mArticleList's
      * item's data type.
      *
      * @param position  the position (row number) in the recyclerview
@@ -114,10 +106,8 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      */
     @Override
     public int getItemViewType(int position) {
-        if((groupedArticleList == null) || (groupedArticleList.size() == 0)) {
+        if((mArticleList == null) || (mArticleList.size() == 0)) {
             return 0;   //0 = one row for empty dataset
-        } else if (groupedArticleList.get(position) instanceof String) {
-            return 2;   //2 = type String for Header
         }
         return 1;   //1 = type Article
     }
@@ -130,10 +120,10 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      */
     @Override
     public int getItemCount() {
-        if ((groupedArticleList == null) || groupedArticleList.size() == 0) {
+        if ((mArticleList == null) || mArticleList.size() == 0) {
             return 1; //so that we can display one "empty list" row
         }
-        return groupedArticleList.size();
+        return mArticleList.size();
     }
 
     /**
@@ -147,32 +137,7 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-        switch (viewType) {
-            case 0:  // empty data set
-                return emptyRow(parent);
-
-            case 2:  // simple header (one String only)
-                View headerView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.rv_row_header, parent, false);
-                return new ViewHolderHeader(headerView);
-
-            default: // an Article of data
                 return createRowView(parent);
-        }
-    }
-
-    /**
-     * Creates a viewholder to display "No data"
-     *
-     * @param parent  the containing row view
-     * @return        the viewholder
-     */
-    private ViewHolderHeader emptyRow(ViewGroup parent) {
-        View rowView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.rv_row_empty, parent, false);
-
-        return new ViewHolderHeader(rowView);
     }
 
     /**
@@ -184,19 +149,7 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      */
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position){
-        switch(holder.getItemViewType()) {
-            case 0:  // empty data set
-                String checking = context.getString(R.string.checking);
-                ViewHolderHeader vhe = (ViewHolderHeader) holder;
-                vhe.headerTextview.setText(checking);
-                break;
-            case 2:  // simple header (String only)
-                String headerString = (String) groupedArticleList.get(position);
-                ViewHolderHeader vh = (ViewHolderHeader) holder;
-                vh.headerTextview.setText(headerString);
-                break;
-            default: // row of Article data
-                setDataRow(holder, (Article) groupedArticleList.get(position), position);        }
+        setDataRow(holder, mArticleList.get(position), position);
     }
 
 
@@ -241,17 +194,6 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     /**
-     * A custom viewholder class to hold header row information
-     */
-    public static class ViewHolderHeader extends RecyclerView.ViewHolder {
-        TextView headerTextview;
-        ViewHolderHeader(View v) {
-            super(v);
-            headerTextview = v.findViewById(R.id.header_title);
-        }
-    }
-
-    /**
      * A custom viewholder to hold data (Article) row information.
      */
     class ViewHolderArticle extends RecyclerView.ViewHolder {
@@ -264,6 +206,8 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         TextView detailsView;
         CardView cardView;
         FrameLayout frameLayout;
+        TextView headerTextview;
+        TableRow headerFrame;
 
         ViewHolderArticle (View v) {
             super(v);
@@ -275,6 +219,8 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             cardView = v.findViewById(R.id.row_cardview);
             discoveryArrow = v.findViewById(R.id.row_disc_icon);
             frameLayout = view.findViewById(R.id.frame_layout);
+            headerTextview = v.findViewById(R.id.header_title);
+            headerFrame = v.findViewById(R.id.header_row_frame);
         }
     }
 

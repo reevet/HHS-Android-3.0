@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <include layout="@layout/rv_row_header"/>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp">
@@ -32,3 +38,4 @@
             android:src="@drawable/ic_expand_more_black_24dp" />
 
     </RelativeLayout>
+</LinearLayout>

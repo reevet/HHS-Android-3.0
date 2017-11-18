@@ -4,7 +4,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -55,6 +54,14 @@ public class EventsExpRVAdapter extends ExpandableRVAdapter {
         vha.text2.setText(dateString);
         vha.text1.setText(article.getTitle());
         vha.detailsView.setText(article.getDetails());
+
+        String headerString = headers.get(position);
+        if (headerString != null) {
+            vha.headerTextview.setText(headerString);
+            vha.headerFrame.setVisibility(View.VISIBLE);
+        } else {
+            vha.headerFrame.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -62,10 +69,9 @@ public class EventsExpRVAdapter extends ExpandableRVAdapter {
      * will be grouped by day (today, tomorrow, etc)
      *
      * @param list    the data to be sorted, in List form
-     * @return        a list of headers and data rows
      */
     @Override
-    protected List<Object> sortIntoGroups(List<Article> list) {
+    protected void createHeaders(List<Article> list) {
 
         // tracks the date of the current "group"
         int currentYear = -1;
@@ -78,8 +84,6 @@ public class EventsExpRVAdapter extends ExpandableRVAdapter {
         int todayYear = todayCal.get(Calendar.YEAR);
         int todayMonth = todayCal.get(Calendar.MONTH);
         int todayDate = todayCal.get(Calendar.DATE);
-
-        List<Object> tempList = new ArrayList<>();
 
         //cycle through the articles
         for (Article article : list) {
@@ -97,29 +101,26 @@ public class EventsExpRVAdapter extends ExpandableRVAdapter {
                     || (currentMonth != artMonth)
                     || (currentDate != artDate)) {
 
-                String headerString;
-
                 if ((todayYear == artYear)
                         && (todayMonth == artMonth)
                         && (todayDate == artDate)) {
-                    headerString = getContext().getString(R.string.today);
+                    headers.add(getContext().getString(R.string.today));
                 } else if ((todayYear == artYear)
                         && (todayMonth == artMonth)
                         && (todayDate == artDate - 1)) {
-                    headerString = getContext().getString(R.string.tomorrow);
+                    headers.add(getContext().getString(R.string.tomorrow));
                 } else {
                     SimpleDateFormat hFormat = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
-                    headerString = hFormat.format(articleDate);
+                    headers.add(hFormat.format(articleDate));
                 }
 
-                tempList.add(headerString);
                 currentYear = artYear;
                 currentMonth = artMonth;
                 currentDate = artDate;
+            } else {
+                headers.add(null);
             }
-            tempList.add(article);
         }
-        return tempList;
     }
 }
 

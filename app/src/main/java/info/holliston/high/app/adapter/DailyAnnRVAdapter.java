@@ -1,6 +1,7 @@
 package info.holliston.high.app.adapter;
 
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,6 +38,14 @@ public class DailyAnnRVAdapter extends RVAdapter {
                         (RVAdapter.ViewHolderArticle) va;
 
         vha.text1.setText(article.getTitle());
+
+        String headerString = headers.get(position);
+        if (headerString != null) {
+            vha.headerTextview.setText(headerString);
+            vha.headerFrame.setVisibility(View.VISIBLE);
+        } else {
+            vha.headerFrame.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -44,10 +53,9 @@ public class DailyAnnRVAdapter extends RVAdapter {
      * data will be grouped by week of the year (this week, next week, etc)
      *
      * @param list    the data to be sorted, in List form
-     * @return        a list of headers and data rows
      */
     @Override
-    protected List<Object> sortIntoGroups(List<Article> list) {
+    protected void createHeaders(List<Article> list) {
 
         //data will be grouped by week of the year
         int currentWeek = -1;
@@ -72,22 +80,18 @@ public class DailyAnnRVAdapter extends RVAdapter {
                 todaycal.setTime(new Date());
                 int thisWeek = todaycal.get(Calendar.WEEK_OF_YEAR);
 
-                String headerString;
                 if (artWeek == thisWeek) {
-                    headerString = getContext().getString(R.string.this_week);
-                    tempList.add(headerString);
+                    headers.add(getContext().getString(R.string.this_week));
                 } else if ((artWeek == thisWeek-1)) {
-                    headerString = getContext().getString(R.string.last_week);
-                    tempList.add(headerString);
+                    headers.add(getContext().getString(R.string.last_week));
                 } else if ((artWeek == thisWeek-2)) {
-                    headerString = getContext().getString(R.string.earlier);
-                    tempList.add(headerString);
+                    headers.add(getContext().getString(R.string.earlier));
                 }
                 currentWeek = artWeek;
+            } else {
+                headers.add(null);
             }
-            tempList.add(article);
         }
-        return tempList;
     }
 }
 

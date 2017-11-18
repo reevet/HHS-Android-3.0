@@ -2,6 +2,7 @@ package info.holliston.high.app.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.view.View;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
                 (ExpandableRVAdapter.ViewHolderArticleExpandable) va;
         vha.updateItem(position);
 
-        SimpleDateFormat dfDay = new SimpleDateFormat("EEEE", Locale.US);
+        SimpleDateFormat dfDay = new SimpleDateFormat("EEE, MMM d", Locale.US);
         String dayString = dfDay.format(article.getDate());
 
         String title = article.getTitle();
@@ -48,6 +49,14 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
         vha.text1.setText(dayString);
         vha.text2.setText(title);
         vha.detailsView.setText(details);
+
+        String headerString = headers.get(position);
+        if (headerString != null) {
+            vha.headerTextview.setText(headerString);
+            vha.headerFrame.setVisibility(View.VISIBLE);
+        } else {
+            vha.headerFrame.setVisibility(View.GONE);
+        }
     }
 
     /**
@@ -55,13 +64,11 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
      * data will be grouped by week of the year (this week, next week, etc)
      *
      * @param list    the data to be sorted, in List form
-     * @return        a list of headers and data rows
      */
-    protected List<Object> sortIntoGroups(List<Article> list) {
+    protected void createHeaders(List<Article> list) {
 
         //tracks the current group
         int currentWeek = -1;
-        List<Object> tempList = new ArrayList<>();
 
         // if isTrimmable and it's after 2pm and the data is today's data, skip the first row
         if (isTrimmable && needsTrimming(list)) {
@@ -83,18 +90,20 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
                 todaycal.setTime(new Date());
                 int thisWeek = todaycal.get(Calendar.WEEK_OF_YEAR);
 
-                String headerString = "";
                 if (artWeek == thisWeek) {
-                    headerString = getContext().getString(R.string.this_week);
-                } else if ((artWeek == thisWeek+1) || (artWeek == 1)) {
-                    headerString = getContext().getString(R.string.next_week);
+                    headers.add( getContext().getString(R.string.this_week));
+                } else if ((artWeek == thisWeek+1)) {
+                    headers.add( getContext().getString(R.string.next_week));
+                } else if (artWeek == thisWeek+2) {
+                    headers.add(getContext().getString(R.string.farther));
+                } else {
+                    headers.add(null);
                 }
-                tempList.add(headerString);
                 currentWeek = artWeek;
+            } else {
+                headers.add(null);
             }
-            tempList.add(article);
         }
-        return tempList;
     }
 }
 
