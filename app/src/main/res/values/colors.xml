@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#b51e12</color>
+    <color name="colorPrimaryDark">#82160d</color>
+    <color name="colorAccent">#00682d</color>
+    <color name="color_darkest_text">#000000</color>
+    <color name="color_dark_text">#444444</color>
+    <color name="color_header_text">#ffffff</color>
+
+    <color name="list_item_title">#222222</color>
+    <color name="list_background">#303030</color>
+    <color name="list_background_pressed">#992416</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="text_shader">#88000000</color>
+    <color name="group_background">#88dddddd</color>
+
+    <color name="detail_card_background">#ffffdd</color>
+
+    <color name="translucent_scrim_top">#55b51e12</color>
+    <color name="translucent_scrim_top_center">#22b51e12</color>
+    <color name="translucent_scrim_bottom">#55b51e12</color>
+    <color name="translucent_scrim_bottom_center">#22b51e12</color>
+</resources>

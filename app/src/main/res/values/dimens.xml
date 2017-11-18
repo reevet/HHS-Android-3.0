@@ -1,0 +1,39 @@
+<resources>
+    <dimen name="text_size_body_1">14sp</dimen>
+    <dimen name="text_size_caption_1">12sp</dimen>
+    <dimen name="text_size_subheading">16sp</dimen>
+    <dimen name="text_size_title">20sp</dimen>
+    <dimen name="text_size_display_1">34sp</dimen>
+    <dimen name="text_size_display_3">56sp</dimen>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="nav_header_vertical_spacing">8dp</dimen>
+    <dimen name="nav_header_height">146dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+	
+    <dimen name="schedule_icon">40dp</dimen>
+    <dimen name="schedule_icon_large">80dp</dimen>
+    <dimen name="news_thumbnail_height">110dp</dimen>
+    <dimen name="news_thumbnail_width">80dp</dimen>
+    <dimen name="news_home_height">80dp</dimen>
+    <dimen name="news_pbar">50dp</dimen>
+    <dimen name="event_time_width">70dp</dimen>
+    <dimen name="disclosure_indicator">15dp</dimen>
+    <dimen name="social_icon">40dp</dimen>
+
+    <!-- Home Cards -->
+    <dimen name="home_sched_icon">40dp</dimen>
+    <dimen name="dailyann_icon">20dp</dimen>
+
+    <dimen name="sheet_text_scrim_height_top">200dp</dimen>
+    <dimen name="sheet_text_scrim_height_bottom">250dp</dimen>
+
+    <!--text sizes  -->
+    <dimen name="section_header_text_size">24sp</dimen>
+    <dimen name="section_subhead_size">18sp</dimen>
+    <dimen name="ex_list_group_text_size">18sp</dimen>
+    <dimen name="row_normal_text_size">18sp</dimen>
+    <dimen name="row_smaller_text_size">14sp</dimen>
+</resources>

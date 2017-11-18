@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/nav_grop_home">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="@string/nav_home" />
+    </group>
+    <group
+        android:id="@+id/nav_group_sections"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_schedules"
+            android:icon="@drawable/ic_schedules"
+            android:title="@string/nav_schedules" />
+        <item
+            android:id="@+id/nav_lunch"
+            android:icon="@drawable/ic_lunch"
+            android:title="@string/lunch_title_plural" />
+        <item
+            android:id="@+id/nav_events"
+            android:icon="@drawable/ic_events"
+            android:title="@string/nav_events" />
+        <item
+            android:id="@+id/nav_dailyann"
+            android:icon="@drawable/ic_announcements"
+            android:title="@string/daily_ann_title" />
+        <item
+            android:id="@+id/nav_news"
+            android:icon="@drawable/ic_news"
+            android:title="@string/news_title" />
+        <item
+            android:id="@+id/nav_sports"
+            android:icon="@drawable/ic_sports"
+            android:title="@string/nav_sports" />
+    </group>
+
+    <group android:id="@+id/nav_group_web" >
+        <item
+            android:id="@+id/nav_website"
+            android:icon="@drawable/ic_hhs_hollow"
+            android:title="@string/nav_website" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@android:drawable/ic_menu_info_details"
+            android:title="@string/nav_about" />
+    </group>
+
+</menu>
