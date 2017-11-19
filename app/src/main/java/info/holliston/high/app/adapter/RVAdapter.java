@@ -152,7 +152,6 @@ public abstract class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         setDataRow(holder, mArticleList.get(position), position);
     }
 
-
     /**
      * Determines is the current time is after 2pm, and if the first row of data has already passed.
      *
