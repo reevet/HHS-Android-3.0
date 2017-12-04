@@ -4,7 +4,6 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverter;
-import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
@@ -48,7 +47,11 @@ public class Article {
     @ColumnInfo(name = "imgSrc")
     private String imgSrc;
 
-    static final String TABLENAME = "article";
+    // endregion
+    //==============================================================================================
+    // region String values
+    //==============================================================================================
+
     //types
     public static final String SCHEDULES = "schedules";
     public static final String EVENTS = "events";
@@ -56,14 +59,21 @@ public class Article {
     public static final String DAILY_ANN = "dailyann";
     public static final String NEWS = "news";
 
-    //columns
-    private static final String COLUMN_URL = "url";
-    private static final String COLUMN_TITLE = "title";
-    private static final String COLUMN_DATE = "date";
-    private static final String COLUMN_DETAILS = "details";
-    private static final String COLUMN_IMGSRC = "imgSrc";
-    private static final String COLUMN_TYPE = "type";
+    // endregion
+    //==============================================================================================
+    // region Constructor and Key
+    //==============================================================================================
 
+    /**
+     * Constructor for an article
+     *
+     * @param title    the title of the post, or summary of the event
+     * @param url      the url to the post or event
+     * @param date     the post's publish date, or the event's start date
+     * @param details  the post's content, or the event's description
+     * @param imgSrc   the url to the article's image
+     * @param type     the data type (see "types" above)
+     */
     public Article(String title, String url, @NonNull Date date, String details, String imgSrc, String type)
     {
         this.title = title == null ? "" : title;
@@ -75,6 +85,15 @@ public class Article {
         this.key = makeKey(url, title, date);
     }
 
+    /**
+     * Makes a unique key for each article, based on the article's url (preferably)
+     * or the article's date and title.
+     *
+     * @param url    the url to use
+     * @param title  the title to use
+     * @param date   the date to use
+     * @return       the generated key
+     */
     private static String makeKey(String url, String title, Date date) {
 
         //The key is simply the referring URL, safely stored
@@ -92,8 +111,13 @@ public class Article {
         return tempKey;
     }
 
+    // endregion
+    //==============================================================================================
+    // region Convertors
+    //==============================================================================================
+
     /**
-     * Converters to help dates store as longs
+     * Converters to help Room convert dates as longs
      */
     public static class Converters {
         @TypeConverter
@@ -109,29 +133,29 @@ public class Article {
     }
 
     /**
-     * Generates an Article from a set of ContentValues values
+     * Takes an articleList and sets the value of each article to the provided type.
+     * Typically used after parsing.
      *
-     * @param values  the ContentValues to be parsed
+     * @param type          the type to set (schedules, news, etc)
+     * @param articleList   the list of articles to update
+     * @return              the same list, with type updated
      */
-    static Article fromContentValues(ContentValues values) {
-        String title = values.getAsString(Article.COLUMN_TITLE);
-        Date date = new Date(values.getAsLong(Article.COLUMN_DATE));
-        String details = values.getAsString(Article.COLUMN_DETAILS);
-        String url = values.getAsString(Article.COLUMN_URL);
-        String imgSrc = values.getAsString(Article.COLUMN_IMGSRC);
-        String type = values.getAsString(Article.COLUMN_TYPE);
-
-        return new Article(title, url, date, details, imgSrc, type);
-    }
-
     static List<Article> addTypeToList(String type, List<Article> articleList) {
+        // cycles through the articles
         for (int i = 0; i < articleList.size(); i++) {
             Article article = articleList.get(i);
+            // creates a new article with that type
             article.setType(type);
+            // swaps the new article in for the old one
             articleList.set(i, article);
         }
         return articleList;
     }
+
+    // endregion
+    //==============================================================================================
+    // region Accessors
+    //==============================================================================================
 
     public long getId() {
         return id;

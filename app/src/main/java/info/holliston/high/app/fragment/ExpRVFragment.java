@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -27,7 +28,7 @@ import info.holliston.high.app.datamodel.database.ArticleDao;
 import info.holliston.high.app.datamodel.database.ArticleDatabase;
 
 /**
- * A fragment with an Expandable RecyclerFragment as its main layout.
+ * A fragment with an Expandable RecyclerFragment as its options layout.
  *
  * @author Tom Reeve
  */
@@ -43,24 +44,9 @@ public class ExpRVFragment extends Fragment {
     // the type of data stored
     private String mSource;
 
-    /**
-     * Prepares the fragment to receive broadcast intents,such as the one from the AsyncDownloader
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().registerReceiver(receiver, new IntentFilter(DownloaderAsyncTask.APP_RECEIVER));
-    }
-
-    /**
-     * Stops the fragment from receiving broadcast intents
-     */
-    @Override
-    public void onStop()
-    {
-        getActivity().unregisterReceiver(receiver);
-        super.onStop();
-    }
+    //==============================================================================================
+    // region Lifecycle
+    //==============================================================================================
 
     /**
      * Creates the fragments views
@@ -104,15 +90,50 @@ public class ExpRVFragment extends Fragment {
         }
     }
 
+    /**
+     * Prepares the fragment to receive broadcast intents,such as the one from the AsyncDownloader
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().registerReceiver(receiver, new IntentFilter(DownloaderAsyncTask.APP_RECEIVER));
+    }
+
+    /**
+     * Stops the fragment from receiving broadcast intents
+     */
+    @Override
+    public void onStop()
+    {
+        getActivity().unregisterReceiver(receiver);
+        super.onStop();
+    }
+
+    // endregion
+    //==============================================================================================
+    // region Data processing
+    //==============================================================================================
+
+    /**
+     * Gets the articles from the article store
+     *
+     * @return  a list of current articles to display
+     */
     private List<Article> getArticles(){
-        Date today = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Date checkDate = cal.getTime();
+
         ArticleDao dao = ArticleDatabase.getInstance(getContext()).articleDao();
 
         switch (mSource) {
             case Article.SCHEDULES:
             case Article.LUNCH:
             case Article.EVENTS:
-                return dao.getArticlesAfter(today, mSource);
+                return dao.getArticlesAfter(checkDate, mSource);
 
             case Article.NEWS:
             case Article.DAILY_ANN:
@@ -130,6 +151,11 @@ public class ExpRVFragment extends Fragment {
         new DownloaderAsyncTask(getContext())
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
+
+    // endregion
+    //==============================================================================================
+    // region Receiver
+    //==============================================================================================
 
     /*
      * Receive messages for data refresh completion or notification
@@ -155,6 +181,11 @@ public class ExpRVFragment extends Fragment {
             }
         }
     };
+
+    // endregion
+    //==============================================================================================
+    // region Accessors
+    //==============================================================================================
 
     public void setSource(String mSource) {
         this.mSource = mSource;

@@ -18,6 +18,11 @@ class ToolbarSettings {
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private Toolbar mToolbar;
 
+    //==============================================================================================
+    //region Constructor
+    //==============================================================================================
+
+
     ToolbarSettings(AppBarLayout appBarLayout,
                            CollapsingToolbarLayout collapsingToolbarLayout,
                            Toolbar toolbar) {
@@ -26,6 +31,10 @@ class ToolbarSettings {
         mCollapsingToolbarLayout.setTitleEnabled(true);
         mToolbar = toolbar;
     }
+    // endregion
+    //==============================================================================================
+    //region Accessors
+    //==============================================================================================
 
     Toolbar getToolbar() {
         return mToolbar;

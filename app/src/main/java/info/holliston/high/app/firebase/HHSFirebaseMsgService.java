@@ -27,13 +27,16 @@ import info.holliston.high.app.datamodel.DownloaderAsyncTask;
 
 public class HHSFirebaseMsgService extends FirebaseMessagingService {
 
+    /**
+     * Processes cloud notifications received when the app is in the FOREGROUND
+     */
     private static final String TAG = "MyAndroidFCMService";
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
+        // Make a system notification out of this cloud notification
         RemoteMessage.Notification notification = remoteMessage.getNotification();
         if (notification != null) {
-
             //Log data to Log Cat
             Log.d(TAG, "Notification From: " + remoteMessage.getFrom());
             Log.d(TAG, "Notification Message: " + remoteMessage.getNotification().getBody());
@@ -41,23 +44,31 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
             createNotification(remoteMessage.getNotification().getBody());
         }
 
+        // Process the data portion of the cloud notification
         Map<String, String> data = remoteMessage.getData();
         if ((data != null) && (data.size()>0)) {
             if (data.containsKey("update_data")) {
-                updateData(data.get("update_data"));
+                updateData();
             }
         }
     }
 
+    /**
+     * Creates a system notification
+     *
+     * @param messageBody the notification message to show
+     */
     private void createNotification( String messageBody) {
 
+        // Creates an intent so the app opens when the user clicks the notification
         Intent intent = new Intent( this , MainActivity.class );
-        intent.putExtra("showNewNews", "true");
+        intent.putExtra("newsTitle", messageBody);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultIntent = PendingIntent.getActivity( this , 0, intent,
-                PendingIntent.FLAG_ONE_SHOT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
+        // Creates the notification with the intent
         Uri notificationSoundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder( this, "HHS_ID")
                 .setSmallIcon(R.mipmap.ic_launcher)
@@ -67,20 +78,21 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
                 .setSound(notificationSoundURI)
                 .setContentIntent(resultIntent);
 
+        // Cancels past notifications and posts this new one
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (notificationManager != null) {
+         if (notificationManager != null) {
             notificationManager.cancelAll();
             notificationManager.notify(0, mNotificationBuilder.build());
-
         }
     }
 
-    private void updateData(String source) {
-        if (source == null) { source = "";}
+    /**
+     * Calls a new Async data refresh. The MainActivity and/or fragment listeners should
+     * respond when the refresh is done.
+     */
+    private void updateData() {
         DownloaderAsyncTask task = new DownloaderAsyncTask(getApplicationContext());
-        task.setSource(source);
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

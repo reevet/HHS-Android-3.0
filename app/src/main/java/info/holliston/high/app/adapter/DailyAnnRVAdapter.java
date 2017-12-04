@@ -3,7 +3,6 @@ package info.holliston.high.app.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,12 +18,24 @@ import info.holliston.high.app.datamodel.Article;
  *
  * @author Tom Reeve
  */
-
 public class DailyAnnRVAdapter extends RVAdapter {
 
+    //==============================================================================================
+    // region Constructor
+    //==============================================================================================
+
+    /**
+     * Constructor
+     * @param ma    the MainActivity of the app
+     */
     public DailyAnnRVAdapter(MainActivity ma){
         super(ma, R.layout.rv_row_dailyann, false);
     }
+
+    // endregion
+    //==============================================================================================
+    // region Data organizing
+    //==============================================================================================
 
     /**
      * Adds data to the data row viewholder
@@ -34,11 +45,10 @@ public class DailyAnnRVAdapter extends RVAdapter {
      */
     @Override
     protected void setDataRow(RecyclerView.ViewHolder va, Article article, int position) {
-                RVAdapter.ViewHolderArticle vha =
-                        (RVAdapter.ViewHolderArticle) va;
+        // casts the viewholder as a ViewHolderArticle
+        RVAdapter.ViewHolderArticle vha = (RVAdapter.ViewHolderArticle) va;
 
-        vha.text1.setText(article.getTitle());
-
+        // fills and shows the header view, if available
         String headerString = headers.get(position);
         if (headerString != null) {
             vha.headerTextview.setText(headerString);
@@ -46,6 +56,9 @@ public class DailyAnnRVAdapter extends RVAdapter {
         } else {
             vha.headerFrame.setVisibility(View.GONE);
         }
+
+        // fills the article title
+        vha.text1.setText(article.getTitle());
     }
 
     /**
@@ -59,13 +72,7 @@ public class DailyAnnRVAdapter extends RVAdapter {
 
         //data will be grouped by week of the year
         int currentWeek = -1;
-        List<Object> tempList = new ArrayList<>();
 
-        // if this is set as trimmable, if it is now after 2pm, and if the first row has today's
-        // data, then skip the first row
-        if (isTrimmable && needsTrimming(list)) {
-            list.remove(0);
-        }
         //cycle through the articles
         for (Article article : list){
 

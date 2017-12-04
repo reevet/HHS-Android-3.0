@@ -1,7 +1,5 @@
 package info.holliston.high.app;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
@@ -11,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -24,13 +21,12 @@ import android.view.MenuItem;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import info.holliston.high.app.datamodel.Article;
 import info.holliston.high.app.datamodel.DownloaderAsyncTask;
+import info.holliston.high.app.firebase.HHSBroadcastReceiver;
 import info.holliston.high.app.fragment.AboutFragment;
-import info.holliston.high.app.fragment.FragmentOrganizer;
 
 /**
- * This is the main activity, where the app begins. It controls the main lifecycle
+ * This is the options activity, where the app begins. It controls the options lifecycle
  * of the android app and launches any fragment sections needed.
  *
  * @author Tom Reeve
@@ -38,15 +34,22 @@ import info.holliston.high.app.fragment.FragmentOrganizer;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    // a holder for adjusting the toolbar title and parallax image
     ToolbarSettings mToolbarSettings;
+
+    // a helper for managing transitions between fragments
     FragmentOrganizer mFragmentOrganizer;
 
-    /* ***** OVERRIDE METHODS ********
-     * Overriding creation methods from the superclass Activity
-     */
+    // waits for cloud notifications and responds appropriately
+    HHSBroadcastReceiver receiver = new HHSBroadcastReceiver();
+
+    //==============================================================================================
+    //region Activity lifecycle
+    //==============================================================================================
+
 
     /**
-     * Builds the activity, initializes main views, setup method variables
+     * Builds the activity, initializes options views, setup method variables
      *
      * @param savedInstanceState  saved state to restore from when the activity goes to sleep
      */
@@ -68,19 +71,40 @@ public class MainActivity extends AppCompatActivity
         // creates a helper class object to manage fragment transitions
         mFragmentOrganizer = new FragmentOrganizer(this);
 
-        // sets the initial view for the app, based on a notification or not
-        String newsDetail = getIntent().getStringExtra("update_data");
-        Intent intent = getIntent();
-        if ((newsDetail != null) && (!newsDetail.equals(""))) {
-            // this gives the detail somewhere to go if Back is pressed
-            mFragmentOrganizer.sendToDetailFragment(Article.NEWS, 0);
-        } else {
-            mFragmentOrganizer.pushHomeFragment();
+        // starts on the Home page
+        mFragmentOrganizer.pushHomeFragment();
+
+        // detects if the app was launched by user clicking a cloud notification
+        // that a new News post is available. If so, to opens that post's
+        // detail page. This is done even though we just called .pushHomeFragment,
+        // so that the detail page has somewhere to go if the user pushes the Back button.
+        String newsTitle = getIntent().getStringExtra("update_data");
+        if ((newsTitle != null) && (!newsTitle.equals(""))) {
+            mFragmentOrganizer.showNewNews(newsTitle);
         }
     }
 
     /**
-     * Handles the Back button. This is overridden so that the backbutton will close the
+     * Prepares the fragment to receive broadcast intents,such as the one from the AsyncDownloader
+     */
+    @Override
+    public void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(DownloaderAsyncTask.APP_RECEIVER));
+    }
+
+    /**
+     * Stops the fragment from receiving broadcast intents
+     */
+    @Override
+    public void onStop()
+    {
+        unregisterReceiver(receiver);
+        super.onStop();
+    }
+
+    /**
+     * Handles the Back button. This is overridden so that the back button will close the
      * menu drawer if open.
      */
     @Override
@@ -89,8 +113,10 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+
+            // check the number of items in the "back stack." If there aren't any,
+            // just go to the Home screen.
             FragmentManager manager = getSupportFragmentManager();
-            int count = manager.getBackStackEntryCount();
             if (manager.getBackStackEntryCount() <= 1) {
                 mFragmentOrganizer.pushHomeFragment();
             } else {
@@ -99,23 +125,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Creates the Settings (three dots) menu that appears in the top right of the toolbar
-     *
-     * @param menu the menu created from the menu layout
-     *
-     * @return true (allows normal menu processing to proceed)
-     */
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+    // endregion
+    //==============================================================================================
+    // region Setup
+    //==============================================================================================
 
-    /* ***** SETUP METHODS ********
-     * Used only to setup the activity and its elements
-     */
 
     /**
      *  Subscribes this app instance to the Firebase messaging, with relevant topics. Firebase will
@@ -170,9 +184,23 @@ public class MainActivity extends AppCompatActivity
         return new ToolbarSettings(appBarLayout, collapsingToolbarLayout, toolbar);
     }
 
-    /* ***** NAVIGATION METHODS ********
-     * Used to direct to appropriate fragments (pages) based on user input
+    /**
+     * Creates the Settings (three dots) menu that appears in the top right of the toolbar
+     *
+     * @param menu the menu created from the menu layout
+     * @return true (allows normal menu processing to proceed)
      */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.options, menu);
+        return true;
+    }
+
+    // endregion
+    //==============================================================================================
+    // region Navigation direction
+    //==============================================================================================
 
     /**
      * Handles clicks in the manu nav drawer
@@ -213,16 +241,25 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Redirects the user to the HHS website, usually in response to the nav button
+     */
     private void openWebsite() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.website_url_hhs)));
         startActivity(browserIntent);
     }
 
+    /**
+     * Redirects the user to the HHS sports schedules webpage, usually in response to the nav button
+     */
     private void openSports() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.website_url_sports)));
         startActivity(browserIntent);
     }
 
+    /**
+     * Displays an About Page, usually in response to the nav button
+     */
     private void showAbout() {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         AboutFragment aboutFragment = new AboutFragment();
@@ -233,7 +270,6 @@ public class MainActivity extends AppCompatActivity
      * Handles clicks within the Settings menu
      *
      * @param item the item that was clicked
-     *
      * @return whether the superclass is allowed to proceed with normal menu processing
      */
     @Override
@@ -246,8 +282,10 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-    /* ******  HELPER METHODS  **********/
+    // endregion
+    //==============================================================================================
+    // region Toolbar adjustments
+    //==============================================================================================
 
     /**
      * Sets the title that appears at the top of the collapsing toolbar
@@ -268,20 +306,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Starts async tasks to pull new data from the servers
-     */
-    private void callDataRefresh() {
-        new DownloaderAsyncTask(this)
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    /**
      * Opens or closes the collapsing toolbar
      *
      * @param expand  true to expand, false to collapse
      */
     public void setAppBarExpanded(Boolean expand) {
         mToolbarSettings.setAppBarExpanded(expand);
+    }
+
+    //endregion
+    //==============================================================================================
+    // region Data & Fragment Transitions
+    //==============================================================================================
+
+    /**
+     * Starts async tasks to pull new data from the servers
+     */
+    private void callDataRefresh() {
+        new DownloaderAsyncTask(this)
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**
@@ -293,5 +336,5 @@ public class MainActivity extends AppCompatActivity
         return mFragmentOrganizer;
     }
 
-
+    // endregion
 }

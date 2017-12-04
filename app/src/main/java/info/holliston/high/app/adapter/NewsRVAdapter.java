@@ -34,13 +34,15 @@ public class NewsRVAdapter extends RVAdapter {
         RVAdapter.ViewHolderArticle vha =
                 (RVAdapter.ViewHolderArticle) vh;
 
+        // fills the title
+        vha.text1.setText(article.getTitle());
 
+        // fills the date
         SimpleDateFormat dfFull = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
         String fullString = dfFull.format(article.getDate());
-
-        vha.text1.setText(article.getTitle());
         vha.text2.setText(fullString);
 
+        // fills the image thumbnail
         GlideApp.with(getContext())
                 .load(article.getImgSrc())
                 .placeholder(R.drawable.h_logo_square)

@@ -29,4 +29,7 @@ public interface ArticleDao {
     @Query("SELECT * FROM article WHERE date >= :date AND type = :type ORDER BY date ASC")
     List<Article> getArticlesAfter(Date date, String type);
 
+    @Query("SELECT * FROM article WHERE title = :headline ORDER BY date DESC LIMIT 1")
+    Article getNewsArticleWithTitle(String headline);
+
 }

@@ -14,6 +14,11 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     private final OnItemClickListener mListener;
     private final GestureDetector mGestureDetector;
 
+    /**
+     * Constructor
+     * @param context  the app context
+     * @param listener the base listener
+     */
     public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
         mListener = listener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -24,6 +29,12 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         });
     }
 
+    /**
+     * Adds row data into the listener
+     * @param view  the view (row) that is clicked
+     * @param e     the standard motion event
+     * @return      false, prevents additional action
+     */
     @Override
     public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
         View childView = view.findChildViewUnder(e.getX(), e.getY());

@@ -20,9 +20,23 @@ import info.holliston.high.app.datamodel.Article;
  */
 public class SchedulesExpRVAdapter extends ExpandableRVAdapter {
 
+    //==============================================================================================
+    // region Constructor
+    //==============================================================================================
+
+    /**
+     * Constructor
+     *
+     * @param ma  the MainActivity of the app
+     */
     public SchedulesExpRVAdapter(MainActivity ma){
         super(ma, R.layout.rv_row_schedules, true);
     }
+
+    // endregion
+    //==============================================================================================
+    // region Data organization
+    //==============================================================================================
 
     /**
      * Adds data to the data row viewholder
@@ -35,21 +49,32 @@ public class SchedulesExpRVAdapter extends ExpandableRVAdapter {
         ExpandableRVAdapter.ViewHolderArticleExpandable vha =
                 (ExpandableRVAdapter.ViewHolderArticleExpandable) va;
 
+        // updates whether the row is expanded or not
         vha.updateItem(position);
 
-        SimpleDateFormat dfDay = new SimpleDateFormat("EEEE", Locale.US);
-        String dayString = dfDay.format(article.getDate());
+        // if a header exists, fills and shows it
+        String headerString = headers.get(position);
+        if (headerString != null) {
+            vha.headerTextview.setText(headerString);
+            vha.headerFrame.setVisibility(View.VISIBLE);
+        } else {
+            vha.headerFrame.setVisibility(View.GONE);
+        }
 
-        SimpleDateFormat dfFull = new SimpleDateFormat("MMMM d, yyyy", Locale.US);
+        // fills the title
+        vha.text2.setText(article.getTitle());
+
+        // fills the full date
+        SimpleDateFormat dfFull = new SimpleDateFormat("EEE, MMM d, yyyy", Locale.US);
         String fullString = dfFull.format(article.getDate());
+        vha.text1.setText(fullString);
 
-        vha.text1.setText(dayString);
-        vha.text2.setText(fullString);
+        // fills the details
         String details = article.getDetails();
         vha.detailsView.setText(details);
 
+        // fills the icon image
         char initial = article.getTitle().charAt(0);
-
         switch (initial) {
             case 'A':
                 vha.icon.setImageResource(R.drawable.a_sm);
@@ -66,14 +91,6 @@ public class SchedulesExpRVAdapter extends ExpandableRVAdapter {
             default:
                 vha.icon.setImageResource(R.drawable.star_sm);
                 break;
-        }
-
-        String headerString = headers.get(position);
-        if (headerString != null) {
-            vha.headerTextview.setText(headerString);
-            vha.headerFrame.setVisibility(View.VISIBLE);
-        } else {
-            vha.headerFrame.setVisibility(View.GONE);
         }
     }
 

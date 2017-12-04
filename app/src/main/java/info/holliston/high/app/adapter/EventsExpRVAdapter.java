@@ -18,12 +18,25 @@ import info.holliston.high.app.datamodel.Article;
  *
  * @author Tom Reeve
  */
-
 public class EventsExpRVAdapter extends ExpandableRVAdapter {
 
+    //==============================================================================================
+    // region Constructor
+    //==============================================================================================
+
+    /**
+     * Constructor
+     *
+     * @param ma The MainActivity of the app
+     */
     public EventsExpRVAdapter(MainActivity ma){
         super(ma, R.layout.rv_row_events, false);
     }
+
+    // endregion
+    //==============================================================================================
+    // region Data organizing
+    //==============================================================================================
 
     /**
      * Adds data to the data row viewholder
@@ -36,25 +49,7 @@ public class EventsExpRVAdapter extends ExpandableRVAdapter {
         ExpandableRVAdapter.ViewHolderArticleExpandable vha =
                 (ExpandableRVAdapter.ViewHolderArticleExpandable) va;
 
-        vha.updateItem(position);
-
-        SimpleDateFormat df = new SimpleDateFormat("h:mm a", Locale.US);
-        String dateString = df.format(article.getDate());
-        if (dateString.equals("12:00 AM")) {
-            dateString = getContext().getString(R.string.all_day);
-        }
-
-        String details = article.getDetails();
-        if ((details == null) || (details.equals(""))) {
-            vha.discoveryArrow.setVisibility(View.GONE);
-            vha.cardView.setVisibility(View.GONE);
-            vha.expandableLayout.setExpand(false);
-        }
-
-        vha.text2.setText(dateString);
-        vha.text1.setText(article.getTitle());
-        vha.detailsView.setText(article.getDetails());
-
+        // if there is a header, fills and shows it
         String headerString = headers.get(position);
         if (headerString != null) {
             vha.headerTextview.setText(headerString);
@@ -62,6 +57,29 @@ public class EventsExpRVAdapter extends ExpandableRVAdapter {
         } else {
             vha.headerFrame.setVisibility(View.GONE);
         }
+
+        // updates whether the row is expanded or not
+        vha.updateItem(position);
+
+        // fills the title
+        vha.text1.setText(article.getTitle());
+
+        // fills the date
+        SimpleDateFormat df = new SimpleDateFormat("h:mm a", Locale.US);
+        String dateString = df.format(article.getDate());
+        if (dateString.equals("12:00 AM")) {
+            dateString = getContext().getString(R.string.all_day);
+        }
+        vha.text2.setText(dateString);
+
+        //fills the details
+        String details = article.getDetails();
+        if ((details == null) || (details.equals(""))) {
+            vha.discoveryArrow.setVisibility(View.GONE);
+            vha.cardView.setVisibility(View.GONE);
+            vha.expandableLayout.setExpand(false);
+        }
+        vha.detailsView.setText(article.getDetails());
     }
 
     /**

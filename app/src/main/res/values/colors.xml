@@ -16,8 +16,8 @@
 
     <color name="detail_card_background">#ffffdd</color>
 
-    <color name="translucent_scrim_top">#55b51e12</color>
-    <color name="translucent_scrim_top_center">#22b51e12</color>
-    <color name="translucent_scrim_bottom">#55b51e12</color>
-    <color name="translucent_scrim_bottom_center">#22b51e12</color>
+    <color name="translucent_scrim_top">#44000000</color>
+    <color name="translucent_scrim_top_center">#11000000</color>
+    <color name="translucent_scrim_bottom">#44000000</color>
+    <color name="translucent_scrim_bottom_center">#11000000</color>
 </resources>

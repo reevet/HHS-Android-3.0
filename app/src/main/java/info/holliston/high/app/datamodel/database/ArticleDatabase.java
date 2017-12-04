@@ -19,7 +19,7 @@ public abstract class ArticleDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             INSTANCE =
                     Room.databaseBuilder(context.getApplicationContext(), ArticleDatabase.class, "article")
-                            // allow queries on the main thread.
+                            // allow queries on the options thread.
                             // Don't do this on a real app! See PersistenceBasicSample for an example.
                             .allowMainThreadQueries()
                             .build();

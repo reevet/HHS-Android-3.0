@@ -23,11 +23,15 @@ import info.holliston.high.app.R;
 
 public abstract class ExpandableRVAdapter extends RVAdapter {
 
-    // a list of items that are currently expanded
+    // the list of items that are currently expanded
     private HashSet<Integer> expandedPositionSet = new HashSet<>();
 
+    //==============================================================================================
+    // region Constructor
+    //==============================================================================================
+
     /**
-     * Creates an instance of ExpandableRVAdapter
+     * Constructor
      *
      * @param context            the context of the activity
      * @param rowLayout          the layout resource of this fragment
@@ -36,6 +40,12 @@ public abstract class ExpandableRVAdapter extends RVAdapter {
     ExpandableRVAdapter(Context context, int rowLayout, Boolean trimIfAfterSchool){
         super(context, rowLayout, trimIfAfterSchool);
     }
+
+
+    // endregion
+    //==============================================================================================
+    // region ViewHolder
+    //==============================================================================================
 
     /**
      * An extension of RVAdpter's viewholder, to add the expandableLayout and its
@@ -48,7 +58,7 @@ public abstract class ExpandableRVAdapter extends RVAdapter {
             super(v);
             expandableLayout = v.findViewById(R.id.exp_layout);
         }
-
+        // notifies the adapter that a row was expanded
         void updateItem(final int position) {
             if (expandableLayout != null) {
                 expandableLayout.setOnExpandListener(new ExpandableLayout.OnExpandListener() {
@@ -63,7 +73,7 @@ public abstract class ExpandableRVAdapter extends RVAdapter {
     }
 
     /**
-     * Required override, tells the addapter what type of viewholder to use for a data row
+     * Override, tells the adapter what type of viewholder to use for a data row
      *
      * @param parent   the parent view
      * @return         the expandable viewholder
@@ -75,6 +85,11 @@ public abstract class ExpandableRVAdapter extends RVAdapter {
 
         return new ViewHolderArticleExpandable(rowView);
     }
+
+    // endregion
+    //==============================================================================================
+    // region Expanding
+    //==============================================================================================
 
     /**
      * Registers the expand/collapse function of the expandableRV

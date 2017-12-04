@@ -16,7 +16,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -36,21 +35,31 @@ public class JsonFeedParser implements ArticleParser {
     private static final String parserNameDate = "published";
     private static final String parserNameDetails = "content";
 
+    //==============================================================================================
+    // region Parsing loops
+    //==============================================================================================
+
     /*
-     * Main method that pulls the data to fromContentValues
+     * Main method that pulls the data from inputstream
+     *
+     * @param in  the inputstream
+     * @return    the list of parsed articles
      */
     public List<Article> parse(InputStream in)  {
         List<Article> articleList = new ArrayList<>();
 
+        // reads data from the inputstream
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         StringBuilder sb = new StringBuilder();
-
         String line;
 
+        // adds each line of input into a string
         try {
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append("\n");
             }
+
+            // parses the generated data string
             articleList = readFeed(sb.toString());
         } catch (Exception e) {
             Log.e("ArticleParser",  "error: " + e.toString());
@@ -64,66 +73,75 @@ public class JsonFeedParser implements ArticleParser {
         return articleList;
     }
 
-    /*
-     * Takes a fromContentValues object and extracts the info
-     * Serially reads tags to find articles, and then
-     * sends them out for processing
+    /**
+     * Finds individual items in the data string, and parses each one
+     *
+     * @param input  the data string to parse
+     * @return       the lists of newly parsed articles
      */
     private List<Article> readFeed(String input) {
         List<Article> articleList = new ArrayList<>();
 
         try {
+            // converts the data into a JSON object
             JSONObject calObj = new JSONObject(input);
 
+            //gets the array of items
             JSONArray items = calObj.getJSONArray(parserNameEntry);
+            // loops through the items
             for (int i = 0; i < items.length(); i++) {
+                // parses each individual item
                 JSONObject event = items.getJSONObject(i);
-                articleList.add(getArticle(event));
+                // add the item to the list
+                Article article = getArticle(event);
+                if (article != null) {
+                    articleList.add(getArticle(event));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return articleList;
-        //return entries;
     }
+
+    /**
+     * Parses the contents of an item. If it encounters a title, summary, or link tag, hands them
+     * of to their respective "read" methods for processing. Otherwise, skips the tag.
+     *@param event   the JSON item/event to parse
+     *@return        the Article object holding the data's values
+     */
     private Article getArticle(JSONObject event) {
         String title;
         String details;
         String link;
-        String date;
+        Date date;
         String imgSrc;
 
+        // attempt to get each element of the article
         title = readTitle(event);
         details = readSummary(event);
         link = readLink(event);
         date = readDate(event);
         imgSrc = readImgSrc(event);
 
-        Date dateDate;
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss.SSSZ", Locale.US);
-
         if (date != null) {
-            if (date.length() == 24) {
-                format = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss.SSS'Z'", Locale.US);
-            } else if (date.length() == 25) {
-                format = new SimpleDateFormat("yyyy-MM-dd'T'kk:mm:ss-SS:00", Locale.US);
-            } else if (date.length() == 10) {
-                format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            }
+            // return a new article. Type will be filled in later.
+            return new Article(title, link, date, details, imgSrc, "");
         }
-        try {
-            dateDate = format.parse(date);
-        } catch (ParseException e) {
-            dateDate = new Date();
-            Log.d("parser", "Error making date");
-        }
-
-        //the "null" below represents the Key, which we don't bother with for events
-        return new Article(title, link, dateDate, details, imgSrc, "");
+        return null;
     }
 
-    // Processes title tags in the feed.
+    // endregion
+    //==============================================================================================
+    // region Parsing article elements
+    //==============================================================================================
+
+    /**
+     * Processes title tags in the feed.
+     *
+     * @param event the JSON item/event to parse
+     * @return      the title of the item
+     */
     private String readTitle(JSONObject event) {
         String title = "";
         try {
@@ -134,7 +152,12 @@ public class JsonFeedParser implements ArticleParser {
         return title;
     }
 
-    // Processes link tags in the feed.
+    /**
+     * Processes link tags in the feed.
+     *
+     * @param event the JSON item/event to parse
+     * @return      the link url of the item
+     */
     private String readLink(JSONObject event) {
         String link = null;
         try {
@@ -145,36 +168,57 @@ public class JsonFeedParser implements ArticleParser {
         return link;
     }
 
-    private String readDate(JSONObject event) {
-        String date = "";
+    /**
+     * Processes start date in the feed.
+     *
+     * @param event the JSON item/event to parse
+     * @return      the date of the item
+     */
+    private Date readDate(JSONObject event) {
+        Date date = null;
         try {
-            JSONObject startDateObj = event.getJSONObject(parserNameDate);
-            Iterator<String> keys = startDateObj.keys();
-            while (keys.hasNext()) {
-                // loop to get the dynamic key
-                String currentDynamicKey = keys.next();
+            String dateStr = event.getString(parserNameDate);
 
-                // get the value of the dynamic key
-                if (currentDynamicKey.contains("date")) {
-                    date = startDateObj.getString(currentDynamicKey);
+            // creates the base expected date format
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+
+            // other formats, based on the strong length
+            if (dateStr != null) {
+                if (dateStr.length() == 24) {
+                    format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+                } else if (dateStr.length() == 25) {
+                    format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss-SS:00", Locale.US);
+                } else if (dateStr.length() == 10) {
+                    format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
                 }
-
             }
-        } catch (Exception e) {
             try {
-                date = event.getString(parserNameDate);
-            } catch (Exception ex) {
-                Log.e("EventJsonParser","date not found in Json");
+                // creates a Date object based on the format
+                date = format.parse(dateStr);
+            } catch (ParseException e) {
+                Log.d("parser", "Error making date");
             }
+
+
+        } catch (Exception e) {
+            Log.e("EventJsonParser", e.getMessage());
+            Log.e("EventJsonParser","date not found in Json");
         }
         return date;
     }
 
-    // Processes summary tags in the feed.
+    /**
+     * Processes the description tags in the feed.
+     *
+     * @param event the JSON item/event to parse
+     * @return      the details of the item
+     */
     private String readSummary(JSONObject event) {
         String summary = "";
         try {
             summary = event.getString(parserNameDetails);
+
+            // sets up JSoup parsing, to unencode special characters
             Document doc = Jsoup.parse(summary);
 
             Document.OutputSettings settings = doc.outputSettings();
@@ -183,7 +227,6 @@ public class JsonFeedParser implements ArticleParser {
             settings.charset("ASCII");
 
             summary = doc.html();
-
         } catch (Exception e) {
             //e.printStackTrace();
         }
@@ -191,7 +234,12 @@ public class JsonFeedParser implements ArticleParser {
 
     }
 
-    // Processes link tags in the feed.
+    /**
+     * Processes the img tags in the feed.
+     *
+     * @param event the JSON item/event to parse
+     * @return      the img src of the item
+     */
     private String readImgSrc(JSONObject event) {
         String src = null;
         try {

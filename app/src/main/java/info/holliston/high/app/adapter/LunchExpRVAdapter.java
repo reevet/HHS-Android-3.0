@@ -5,7 +5,6 @@ import android.text.Html;
 import android.view.View;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -23,9 +22,22 @@ import info.holliston.high.app.datamodel.Article;
 
 public class LunchExpRVAdapter extends ExpandableRVAdapter {
 
+    //==============================================================================================
+    // region Constructor
+    //==============================================================================================
+
+    /**
+     *
+     * @param ma  the MainActivity of the app
+     */
     public LunchExpRVAdapter(MainActivity ma){
         super(ma, R.layout.rv_row_lunch, true);
     }
+
+    // endregion
+    //==============================================================================================
+    // region Data organization
+    //==============================================================================================
 
     /**
      * Adds data to the data row viewholder
@@ -39,17 +51,7 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
                 (ExpandableRVAdapter.ViewHolderArticleExpandable) va;
         vha.updateItem(position);
 
-        SimpleDateFormat dfDay = new SimpleDateFormat("EEE, MMM d", Locale.US);
-        String dayString = dfDay.format(article.getDate());
-
-        String title = article.getTitle();
-        String details = article.getDetails();
-        details = Html.fromHtml(details).toString();
-
-        vha.text1.setText(dayString);
-        vha.text2.setText(title);
-        vha.detailsView.setText(details);
-
+        // if a header exists, fills and shows it
         String headerString = headers.get(position);
         if (headerString != null) {
             vha.headerTextview.setText(headerString);
@@ -57,6 +59,20 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
         } else {
             vha.headerFrame.setVisibility(View.GONE);
         }
+
+        // fills the title
+        String title = article.getTitle();
+        vha.text2.setText(title);
+
+        // fills the date
+        SimpleDateFormat dfDay = new SimpleDateFormat("EEE, MMM d", Locale.US);
+        String dayString = dfDay.format(article.getDate());
+        vha.text1.setText(dayString);
+
+        // fills the details
+        String details = article.getDetails();
+        details = Html.fromHtml(details).toString();
+        vha.detailsView.setText(details);
     }
 
     /**
