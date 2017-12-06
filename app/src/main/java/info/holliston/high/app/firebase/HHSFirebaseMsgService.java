@@ -71,7 +71,7 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
         // Creates the notification with the intent
         Uri notificationSoundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder( this, "HHS_ID")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_stat_name)
                 .setContentTitle("New Post from Holliston High School")
                 .setContentText(messageBody)
                 .setAutoCancel( true )
