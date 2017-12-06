@@ -15,10 +15,11 @@
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/schedule_title_single" />
 
-        <TextView
-            android:id="@+id/row_text_primary_supershort"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:textColor="@android:color/white" />
+    <TextView
+        android:id="@+id/row_text_primary_supershort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center"
+        android:textAlignment="center"
+        android:textColor="@android:color/white" />
     </LinearLayout>
