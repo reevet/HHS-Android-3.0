@@ -1,0 +1,25 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_all"
+    android:background="@drawable/widget_background"
+    android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:orientation="vertical"
+        android:padding="@dimen/widget_margin">
+
+        <ImageView
+            android:id="@+id/row_icon"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/schedule_icon"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/schedule_title_single" />
+
+    <TextView
+        android:id="@+id/row_text_primary_supershort"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center"
+        android:textAlignment="center"
+        android:textColor="@android:color/white" />
+    </LinearLayout>

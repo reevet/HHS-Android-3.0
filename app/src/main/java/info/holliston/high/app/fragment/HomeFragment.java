@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import info.holliston.high.app.GlideApp;
 import info.holliston.high.app.MainActivity;
@@ -454,7 +455,9 @@ public class HomeFragment extends Fragment {
     private Date todayWithoutTime() {
         // sets a comparison date for today at 12 am
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR, 0);
+        cal.setTimeZone(TimeZone.getDefault());
+
+        cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
@@ -470,13 +473,13 @@ public class HomeFragment extends Fragment {
      */private Boolean datesEqual(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance(Locale.US);
         cal1.setTime(date1);
-        cal1.set(Calendar.HOUR, 0);
+        cal1.set(Calendar.HOUR_OF_DAY, 0);
         cal1.set(Calendar.MINUTE, 0);
         cal1.set(Calendar.SECOND, 0);
 
         Calendar cal2 = Calendar.getInstance(Locale.US);
         cal2.setTime(date2);
-        cal2.set(Calendar.HOUR, 0);
+        cal2.set(Calendar.HOUR_OF_DAY, 0);
         cal2.set(Calendar.MINUTE, 0);
         cal2.set(Calendar.SECOND, 0);
 
