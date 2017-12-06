@@ -66,8 +66,8 @@ public class DetailWebviewFragment extends Fragment {
             webHtml = formattedArticle();
         } else {
             webHtml = "<p style='text-align:center'>Loading article....</p>";
-            new DownloaderAsyncTask(getContext())
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            DownloaderAsyncTask task = new DownloaderAsyncTask(getContext(), "news");
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         webview.loadData(webHtml, "text/html",null );

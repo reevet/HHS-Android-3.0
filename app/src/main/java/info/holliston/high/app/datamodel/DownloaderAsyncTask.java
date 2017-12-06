@@ -37,14 +37,16 @@ public class DownloaderAsyncTask extends AsyncTask<Void, Void, Integer> {
     public static final String APP_RECEIVER = "info.holliston.high.app";
     private String feedUrl;
     private WeakReference<Context> context;
+    public String mSource = "all";
 
     // endregion
     //==============================================================================================
     // region Constructor
     //==============================================================================================
 
-    public DownloaderAsyncTask(Context context) {
+    public DownloaderAsyncTask(Context context, String source) {
         this.context = new WeakReference<>(context);
+        this.mSource = source;
     }
 
     // endregion
@@ -60,13 +62,34 @@ public class DownloaderAsyncTask extends AsyncTask<Void, Void, Integer> {
      */
     @Override
     protected Integer doInBackground(Void... params) {
-       int count =0;
-       count += getArticlesFor(Article.SCHEDULES);
-       count += getArticlesFor(Article.NEWS);
-       count += getArticlesFor(Article.EVENTS);
-       count += getArticlesFor(Article.DAILY_ANN);
-       count += getArticlesFor(Article.LUNCH);
-       return count;
+        int count =0;
+
+        if (mSource == "") {
+            mSource = "all";
+        }
+
+        Boolean getSchedules = ((mSource.equals("all")) || (mSource.equals(Article.SCHEDULES)));
+        Boolean getEvents =    ((mSource.equals("all")) || (mSource.equals(Article.EVENTS)));
+        Boolean getLunch =     ((mSource.equals("all")) || (mSource.equals(Article.LUNCH)));
+        Boolean getDailyann =  ((mSource.equals("all")) || (mSource.equals(Article.DAILY_ANN)));
+        Boolean getNews =      ((mSource.equals("all")) || (mSource.equals(Article.NEWS)));
+
+        if (getSchedules) {
+          count += getArticlesFor(Article.SCHEDULES);
+        }
+        if (getEvents) {
+            count += getArticlesFor(Article.EVENTS);
+        }
+        if (getLunch) {
+            count += getArticlesFor(Article.LUNCH);
+        }
+        if (getDailyann) {
+            count += getArticlesFor(Article.DAILY_ANN);
+        }
+        if (getNews) {
+            count += getArticlesFor(Article.NEWS);
+        }
+        return count;
     }
 
     /**
@@ -80,6 +103,7 @@ public class DownloaderAsyncTask extends AsyncTask<Void, Void, Integer> {
         // tell MainActivity that datasource has finished downloading
         Intent intent = new Intent(APP_RECEIVER);
         intent.putExtra("count", count);
+        intent.putExtra("source", mSource);
         context.get().sendBroadcast(intent);
     }
 

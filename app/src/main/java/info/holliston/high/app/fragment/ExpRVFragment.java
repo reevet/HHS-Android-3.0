@@ -148,7 +148,7 @@ public class ExpRVFragment extends Fragment {
      * Requests a call to download new data for this fragment only
      */
     protected void requestNewDownload() {
-        new DownloaderAsyncTask(getContext())
+        new DownloaderAsyncTask(getContext(), mSource)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 

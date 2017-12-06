@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/HollistonHigh300.iml" filepath="$PROJECT_DIR$/HollistonHigh300.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HHS-Android-3.0.iml" filepath="$PROJECT_DIR$/HHS-Android-3.0.iml" />
+      <module fileurl="file://E:\Moose Data\Documents\GitHub\HHS-Android-3.0\HollistonHigh300.iml" filepath="E:\Moose Data\Documents\GitHub\HHS-Android-3.0\HollistonHigh300.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

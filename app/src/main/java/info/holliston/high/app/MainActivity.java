@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity
         SetFirebaseSubscriptions();
 
         // requests async data calls to the server (but will display cached data until it arrives)
-        callDataRefresh();
+        callDataRefresh("all");
 
         // creates a helper class object to manage fragment transitions
         mFragmentOrganizer = new FragmentOrganizer(this);
@@ -78,7 +78,11 @@ public class MainActivity extends AppCompatActivity
         // that a new News post is available. If so, to opens that post's
         // detail page. This is done even though we just called .pushHomeFragment,
         // so that the detail page has somewhere to go if the user pushes the Back button.
-        String newsTitle = getIntent().getStringExtra("update_data");
+        String updateSource = getIntent().getStringExtra("update_data");
+        if ((updateSource != null)) {
+            callDataRefresh(updateSource);
+        }
+        String newsTitle = getIntent().getStringExtra("title");
         if ((newsTitle != null) && (!newsTitle.equals(""))) {
             mFragmentOrganizer.showNewNews(newsTitle);
         }
@@ -277,7 +281,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if  (id == R.id.action_refresh) {
-            callDataRefresh();
+            callDataRefresh("all");
         }
 
         return super.onOptionsItemSelected(item);
@@ -322,8 +326,11 @@ public class MainActivity extends AppCompatActivity
     /**
      * Starts async tasks to pull new data from the servers
      */
-    private void callDataRefresh() {
-        new DownloaderAsyncTask(this)
+    private void callDataRefresh(String source) {
+        if ((source == null) || (source.equals(""))) {
+            source = "all";
+        }
+        new DownloaderAsyncTask(this, source)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 

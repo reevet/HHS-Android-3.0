@@ -41,14 +41,15 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
             Log.d(TAG, "Notification From: " + remoteMessage.getFrom());
             Log.d(TAG, "Notification Message: " + remoteMessage.getNotification().getBody());
             //create notification
-            createNotification(remoteMessage.getNotification().getBody());
+            createNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody());
         }
 
         // Process the data portion of the cloud notification
         Map<String, String> data = remoteMessage.getData();
         if ((data != null) && (data.size()>0)) {
             if (data.containsKey("update_data")) {
-                updateData();
+                String source = data.get("update_data");
+                updateData(source);
             }
         }
     }
@@ -58,7 +59,7 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
      *
      * @param messageBody the notification message to show
      */
-    private void createNotification( String messageBody) {
+    private void createNotification(String messageTitle, String messageBody) {
 
         // Creates an intent so the app opens when the user clicks the notification
         Intent intent = new Intent( this , MainActivity.class );
@@ -72,7 +73,7 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
         Uri notificationSoundURI = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder mNotificationBuilder = new NotificationCompat.Builder( this, "HHS_ID")
                 .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle("New Post from Holliston High School")
+                .setContentTitle(messageTitle)
                 .setContentText(messageBody)
                 .setAutoCancel( true )
                 .setSound(notificationSoundURI)
@@ -91,8 +92,8 @@ public class HHSFirebaseMsgService extends FirebaseMessagingService {
      * Calls a new Async data refresh. The MainActivity and/or fragment listeners should
      * respond when the refresh is done.
      */
-    private void updateData() {
-        DownloaderAsyncTask task = new DownloaderAsyncTask(getApplicationContext());
+    private void updateData(String source) {
+        DownloaderAsyncTask task = new DownloaderAsyncTask(getApplicationContext(), source);
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }
