@@ -93,6 +93,8 @@ public class DailyAnnRVAdapter extends RVAdapter {
                     headers.add(getContext().getString(R.string.last_week));
                 } else if ((artWeek == thisWeek-2)) {
                     headers.add(getContext().getString(R.string.earlier));
+                } else {
+                    headers.add("");
                 }
                 currentWeek = artWeek;
             } else {

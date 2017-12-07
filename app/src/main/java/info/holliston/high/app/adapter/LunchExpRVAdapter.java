@@ -113,7 +113,7 @@ public class LunchExpRVAdapter extends ExpandableRVAdapter {
                 } else if (artWeek == thisWeek+2) {
                     headers.add(getContext().getString(R.string.farther));
                 } else {
-                    headers.add(null);
+                    headers.add("");
                 }
                 currentWeek = artWeek;
             } else {
